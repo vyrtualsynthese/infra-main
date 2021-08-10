@@ -1,0 +1,12 @@
+{
+  "name": "inframain",
+  "scripts": {
+    "terraform": "docker run -it --rm -v $PWD:/home/node/app hashicorp/terraform:latest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vyrtualsynthese/infraMain.git"
+  },
+  "author": "",
+  "license": "ISC"
+}
