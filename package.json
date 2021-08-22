@@ -1,7 +1,7 @@
 {
   "name": "inframain",
   "scripts": {
-    "terraform": "docker run -it --rm -v $PWD:/home/node/app hashicorp/terraform:latest"
+    "terraform": "docker run -it --rm -v $PWD:/home/node/app --env-file ../../.env -w /home/node/app hashicorp/terraform:latest"
   },
   "repository": {
     "type": "git",
