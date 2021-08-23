@@ -1,5 +1,7 @@
 terraform {
+
   required_providers {
+
     aws = {
       source  = "hashicorp/aws"
       version = "~> 3.55"
@@ -8,13 +10,16 @@ terraform {
 }
 
 provider "aws" {
+
 }
 
 resource "aws_s3_bucket" "mailingsignature" {
-  bucket = "mailingsignature"
-  acl    = "public-read"
-  policy = jsonencode({
+  bucket      = "mailingsignature"
+  acl         = "public-read"
+
+  policy      = jsonencode({
     "Version": "2012-10-17",
+
     "Statement": [
       {
         Sid: "PublicReadGetObject",
@@ -25,7 +30,8 @@ resource "aws_s3_bucket" "mailingsignature" {
       }
     ]
   })
+
   tags = {
-    project        = "mailingsignature"
+    project = "mailingsignature"
   }
 }

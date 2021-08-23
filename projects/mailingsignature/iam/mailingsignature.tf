@@ -1,30 +1,46 @@
 terraform {
+
   required_providers {
+
     aws = {
       source  = "hashicorp/aws"
       version = "~> 3.55"
     }
+
+    github = {
+      source  = "integrations/github"
+      version = "~> 4.0"
+    }
   }
 }
 
-provider "aws" {
+provider "aws" {}
+
+provider "github" {}
+
+data "aws_s3_bucket" "mailingsignature" {
+  bucket = "mailingsignature"
 }
 
 resource "aws_iam_policy" "mailingsignature" {
   name        = "mailingsignature"
   path        = "/projects/"
+
   tags        = {
     "project" = "mailingsignature"
   }
+
   policy = jsonencode({
-    Version = "2012-10-17"
+    Version   = "2012-10-17"
+
     Statement = [
       {
-        Action = [
+        Action    = [
           "s3:*",
         ]
-        Effect   = "Allow"
-        Resource = "arn:aws:s3:::mailingsignature"
+
+        Effect    = "Allow"
+        Resource  = data.aws_s3_bucket.mailingsignature.arn
       },
     ]
   })
@@ -63,13 +79,25 @@ resource "aws_iam_group_policy_attachment" "mailingsignature" {
   policy_arn = aws_iam_policy.mailingsignature.arn
 }
 
-
-# Should find a way tu push those variables to github action later
-output "access" {
-  value = aws_iam_access_key.mailingsignature-terraform.id
+data "github_repository" "mailingsignature" {
+  full_name = "vyrtualsynthese/ashudevWebsite"
 }
 
-output "secret" {
-  value = aws_iam_access_key.mailingsignature-terraform.secret
-  sensitive = true
+resource "github_repository_environment" "repo_environment" {
+  repository       = data.github_repository.mailingsignature.name
+  environment      = "prod"
+}
+
+resource "github_actions_environment_secret" "aws_access_key_id" {
+  repository       = data.github_repository.mailingsignature.name
+  environment      = github_repository_environment.repo_environment.environment
+  secret_name      = "aws_access_key_id"
+  plaintext_value  = "aws_iam_access_key.mailingsignature-terraform.id"
+}
+
+resource "github_actions_environment_secret" "aws_access_key_secret" {
+  repository       = data.github_repository.mailingsignature.name
+  environment      = github_repository_environment.repo_environment.environment
+  secret_name      = "aws_access_key_secret"
+  plaintext_value  = "aws_iam_access_key.mailingsignature-terraform.secret"
 }
