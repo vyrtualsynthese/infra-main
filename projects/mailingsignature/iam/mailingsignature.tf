@@ -1,3 +1,15 @@
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 3.55"
+    }
+  }
+}
+
+provider "aws" {
+}
+
 resource "aws_iam_policy" "mailingsignature" {
   name        = "mailingsignature"
   path        = "/projects/"
@@ -50,8 +62,6 @@ resource "aws_iam_group_policy_attachment" "mailingsignature" {
   group      = aws_iam_group.mailingsignature.name
   policy_arn = aws_iam_policy.mailingsignature.arn
 }
-
-# + Attach policy to than group
 
 
 # Should find a way tu push those variables to github action later
