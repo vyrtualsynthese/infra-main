@@ -23,24 +23,24 @@ data "aws_s3_bucket" "mailingsignature" {
 }
 
 resource "aws_iam_policy" "mailingsignature" {
-  name        = "mailingsignature"
-  path        = "/projects/"
+  name = "mailingsignature"
+  path = "/projects/"
 
-  tags        = {
+  tags = {
     "project" = "mailingsignature"
   }
 
   policy = jsonencode({
-    Version   = "2012-10-17"
+    Version = "2012-10-17"
 
     Statement = [
       {
-        Action    = [
+        Action = [
           "s3:*",
         ]
 
-        Effect    = "Allow"
-        Resource  = data.aws_s3_bucket.mailingsignature.arn
+        Effect   = "Allow"
+        Resource = data.aws_s3_bucket.mailingsignature.arn
       },
     ]
   })
@@ -56,7 +56,7 @@ resource "aws_iam_user" "mailingsignature-terraform" {
 }
 
 resource "aws_iam_access_key" "mailingsignature-terraform" {
-  user    = aws_iam_user.mailingsignature-terraform.name
+  user = aws_iam_user.mailingsignature-terraform.name
 }
 
 resource "aws_iam_group" "mailingsignature" {
@@ -84,20 +84,20 @@ data "github_repository" "mailingsignature" {
 }
 
 resource "github_repository_environment" "repo_environment" {
-  repository       = data.github_repository.mailingsignature.name
-  environment      = "prod"
+  repository  = data.github_repository.mailingsignature.name
+  environment = "prod"
 }
 
 resource "github_actions_environment_secret" "aws_access_key_id" {
-  repository       = data.github_repository.mailingsignature.name
-  environment      = github_repository_environment.repo_environment.environment
-  secret_name      = "aws_access_key_id"
-  plaintext_value  = "aws_iam_access_key.mailingsignature-terraform.id"
+  repository      = data.github_repository.mailingsignature.name
+  environment     = github_repository_environment.repo_environment.environment
+  secret_name     = "aws_access_key_id"
+  plaintext_value = "aws_iam_access_key.mailingsignature-terraform.id"
 }
 
 resource "github_actions_environment_secret" "aws_access_key_secret" {
-  repository       = data.github_repository.mailingsignature.name
-  environment      = github_repository_environment.repo_environment.environment
-  secret_name      = "aws_access_key_secret"
-  plaintext_value  = "aws_iam_access_key.mailingsignature-terraform.secret"
+  repository      = data.github_repository.mailingsignature.name
+  environment     = github_repository_environment.repo_environment.environment
+  secret_name     = "aws_access_key_secret"
+  plaintext_value = "aws_iam_access_key.mailingsignature-terraform.secret"
 }
