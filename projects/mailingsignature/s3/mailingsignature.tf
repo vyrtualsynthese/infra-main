@@ -14,19 +14,19 @@ provider "aws" {
 }
 
 resource "aws_s3_bucket" "mailingsignature" {
-  bucket      = "mailingsignature"
-  acl         = "public-read"
+  bucket = "mailingsignature"
+  acl    = "public-read"
 
-  policy      = jsonencode({
-    "Version": "2012-10-17",
+  policy = jsonencode({
+    "Version" : "2012-10-17",
 
-    "Statement": [
+    "Statement" : [
       {
-        Sid: "PublicReadGetObject",
-        Effect: "Allow",
-        Principal: "*",
-        Action: "s3:GetObject",
-        Resource: "arn:aws:s3:::mailingsignature/*"
+        Sid : "PublicReadGetObject",
+        Effect : "Allow",
+        Principal : "*",
+        Action : "s3:GetObject",
+        Resource : "arn:aws:s3:::mailingsignature/*"
       }
     ]
   })
