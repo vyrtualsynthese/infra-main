@@ -29,7 +29,7 @@ jobs:
         run: terraform validate -no-color
         working-directory: projects/mailingsignature
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TF_VAR_GIT_TOKEN: ${{ secrets.TF_VAR_GIT_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
@@ -41,7 +41,7 @@ jobs:
         working-directory: projects/mailingsignature
         continue-on-error: true
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TF_VAR_GIT_TOKEN: ${{ secrets.TF_VAR_GIT_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
@@ -85,7 +85,7 @@ jobs:
         run: terraform apply -auto-approve
         working-directory: projects/mailingsignature/s3
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TF_VAR_GIT_TOKEN: ${{ secrets.TF_VAR_GIT_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}

@@ -14,6 +14,14 @@ terraform {
   }
 }
 
+variable "GIT_TOKEN" {
+  type = string
+}
+
+provider "github" {
+  token = var.GIT_TOKEN
+}
+
 resource "aws_s3_bucket" "mailingsignature" {
   bucket = "mailingsignature"
   acl    = "public-read"
