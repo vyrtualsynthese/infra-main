@@ -9,14 +9,41 @@ terraform {
 
     github = {
       source  = "integrations/github"
-      version = "~> 4.0"
+      version = "~> 4.13"
     }
   }
 }
 
-provider "aws" {}
+variable "GIT_TOKEN" {
+  type = string
+}
 
-provider "github" {}
+provider "github" {
+  token = var.GIT_TOKEN
+}
+
+resource "aws_s3_bucket" "mailingsignature" {
+  bucket = "mailingsignature"
+  acl    = "public-read"
+
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+
+    "Statement" : [
+      {
+        Sid : "PublicReadGetObject",
+        Effect : "Allow",
+        Principal : "*",
+        Action : "s3:GetObject",
+        Resource : "arn:aws:s3:::mailingsignature/*"
+      }
+    ]
+  })
+
+  tags = {
+    project = "mailingsignature"
+  }
+}
 
 data "aws_s3_bucket" "mailingsignature" {
   bucket = "mailingsignature"
