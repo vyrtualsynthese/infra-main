@@ -8,17 +8,14 @@ terraform {
   }
 
   required_providers {
-
     aws = {
       source  = "hashicorp/aws"
       version = "~> 3.55"
     }
-
     github = {
       source  = "integrations/github"
       version = "~> 4.13"
     }
-
   }
 }
 
@@ -33,10 +30,8 @@ provider "github" {
 resource "aws_s3_bucket" "mailingsignature" {
   bucket = "mailingsignature"
   acl    = "public-read"
-
   policy = jsonencode({
     "Version" : "2012-10-17",
-
     "Statement" : [
       {
         Sid : "PublicReadGetObject",
@@ -47,7 +42,6 @@ resource "aws_s3_bucket" "mailingsignature" {
       }
     ]
   })
-
   tags = {
     project = "mailingsignature"
   }
@@ -60,20 +54,17 @@ data "aws_s3_bucket" "mailingsignature" {
 resource "aws_iam_policy" "mailingsignature" {
   name = "mailingsignature"
   path = "/projects/"
-
   tags = {
     "project" = "mailingsignature"
   }
 
   policy = jsonencode({
     Version = "2012-10-17"
-
     Statement = [
       {
         Action = [
           "s3:*",
         ]
-
         Effect   = "Allow"
         Resource = data.aws_s3_bucket.mailingsignature.arn
       },
@@ -84,7 +75,6 @@ resource "aws_iam_policy" "mailingsignature" {
 resource "aws_iam_user" "mailingsignature-terraform" {
   name = "mailingsignature-terraform"
   path = "/projects/mailingsignature/"
-
   tags = {
     project = "mailingsignature"
   }
@@ -101,7 +91,6 @@ resource "aws_iam_group" "mailingsignature" {
 
 resource "aws_iam_group_membership" "mailingsignature" {
   name = "tf-mailingsignature-group-membership"
-
   users = [
     aws_iam_user.mailingsignature-terraform.name,
   ]

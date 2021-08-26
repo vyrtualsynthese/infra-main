@@ -2,7 +2,10 @@
   "name": "inframain",
   "scripts": {
     "tf:all": "npm run tf:mailingsignature",
-    "tf:mailingsignature": "docker run -it --rm -v $PWD:/home/node/app --env-file .env -w /home/node/app hashicorp/terraform:latest -chdir=/home/node/app/projects/mailingsignature apply"
+    "tf:mailingsignature:init": "docker run -it --rm -v $PWD:/home/node/app --env-file .env -w /home/node/app hashicorp/terraform:latest -chdir=/home/node/app/projects/mailingsignature init -migrate-state",
+    "tf:mailingsignature:fmt": "docker run -it --rm -u ${UID}:${GID} -v $PWD:/home/node/app --env-file .env -w /home/node/app hashicorp/terraform:latest -chdir=/home/node/app/projects/mailingsignature fmt",
+    "tf:mailingsignature:plan": "docker run -it --rm -v $PWD:/home/node/app --env-file .env -w /home/node/app hashicorp/terraform:latest -chdir=/home/node/app/projects/mailingsignature plan",
+    "tf:mailingsignature:apply": "docker run -it --rm -v $PWD:/home/node/app --env-file .env -w /home/node/app hashicorp/terraform:latest -chdir=/home/node/app/projects/mailingsignature apply"
   },
   "repository": {
     "type": "git",
