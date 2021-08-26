@@ -93,7 +93,7 @@ jobs:
       - name: Terraform Apply
         if: github.ref == 'refs/heads/master' && github.event_name == 'push'
         run: terraform apply -auto-approve
-        working-directory: projects/mailingsignature/s3
+        working-directory: projects/mailingsignature
         env:
           TF_VAR_GIT_TOKEN: ${{ secrets.TF_VAR_GIT_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}

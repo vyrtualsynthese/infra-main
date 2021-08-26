@@ -1,8 +1,10 @@
 terraform {
 
   backend "s3" {
-    bucket = "ashudev-tf-states"
-    key    = "projects/mailingsignature.tfstate"
+    encrypt        = true
+    bucket         = "ashudev-tf-states"
+    key            = "projects/mailingsignature.tfstate"
+    dynamodb_table = "tf-main-lock"
   }
 
   required_providers {
