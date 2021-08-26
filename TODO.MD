@@ -1,4 +1,3 @@
-+ Terraform lock with dynamodb
 + Create repo for mailingsignature
 + Manage github repo for project via terraform
 + Manage all github projects via terraform
