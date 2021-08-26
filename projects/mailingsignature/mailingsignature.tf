@@ -1,5 +1,10 @@
 terraform {
 
+  backend "s3" {
+    bucket = "ashudev-tf-states"
+    key    = "projects/mailingsignature.tfstate"
+  }
+
   required_providers {
 
     aws = {
@@ -11,6 +16,7 @@ terraform {
       source  = "integrations/github"
       version = "~> 4.13"
     }
+
   }
 }
 

@@ -1,9 +1,8 @@
 {
   "name": "inframain",
   "scripts": {
-    "tf:all": "npm run tf:mailingsignature:s3 && npm run tf:mailingsignature:iam",
-    "tf:mailingsignature:s3": "docker run -it --rm -v $PWD:/home/node/app --env-file .env -w /home/node/app hashicorp/terraform:latest -chdir=/home/node/app/projects/mailingsignature/s3 apply",
-    "tf:mailingsignature:iam": "docker run -it --rm -v $PWD:/home/node/app --env-file .env -w /home/node/app hashicorp/terraform:latest -chdir=/home/node/app/projects/mailingsignature/iam apply"
+    "tf:all": "npm run tf:mailingsignature",
+    "tf:mailingsignature": "docker run -it --rm -v $PWD:/home/node/app --env-file .env -w /home/node/app hashicorp/terraform:latest -chdir=/home/node/app/projects/mailingsignature apply"
   },
   "repository": {
     "type": "git",
