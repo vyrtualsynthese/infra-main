@@ -115,19 +115,9 @@ resource "github_repository" "mailing-signature" {
   auto_init              = true
 }
 
-resource "github_branch" "main" {
-  repository = github_repository.mailing-signature.name
-  branch     = "main"
-}
-
 resource "github_branch" "develop" {
   repository = github_repository.mailing-signature.name
   branch     = "develop"
-}
-
-resource "github_branch_default" "default" {
-  repository = github_repository.mailing-signature.name
-  branch     = github_branch.main.branch
 }
 
 resource "github_actions_secret" "aws_access_key_id" {
