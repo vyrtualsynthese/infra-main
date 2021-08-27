@@ -112,6 +112,7 @@ resource "github_repository" "mailing-signature" {
   delete_branch_on_merge = false
   archive_on_destroy     = true
   vulnerability_alerts   = false
+  auto_init              = true
 }
 
 resource "github_branch" "main" {
