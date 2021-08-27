@@ -76,9 +76,11 @@ resource "aws_iam_user" "mailing-signature-terraform" {
   }
 }
 
+/* access key not working atm
 resource "aws_iam_access_key" "mailing-signature-terraform" {
   user = aws_iam_user.mailing-signature-terraform.name
 }
+*/
 
 resource "aws_iam_group" "mailing-signature" {
   name = "mailing-signature"
@@ -120,6 +122,7 @@ resource "github_branch" "develop" {
   branch     = "develop"
 }
 
+/*
 resource "github_actions_secret" "aws_access_key_id" {
   repository      = github_repository.mailing-signature.name
   secret_name     = "aws_access_key_id"
@@ -131,3 +134,4 @@ resource "github_actions_secret" "aws_access_key_secret" {
   secret_name     = "aws_access_key_secret"
   plaintext_value = "aws_iam_access_key.mailing-signature-terraform.secret"
 }
+*/
