@@ -99,25 +99,44 @@ resource "aws_iam_group_policy_attachment" "mailing-signature" {
   policy_arn = aws_iam_policy.mailing-signature.arn
 }
 
-/*data "github_repository" "mailing-signature" {
-  full_name = "vyrtualsynthese/ashudevWebsite"
+resource "github_repository" "mailing-signature" {
+  name                   = "mailing-signature"
+  visibility             = "private"
+  has_issues             = false
+  has_downloads          = false
+  has_wiki               = false
+  has_projects           = false
+  allow_merge_commit     = false
+  allow_squash_merge     = false
+  allow_rebase_merge     = true
+  delete_branch_on_merge = false
+  archive_on_destroy     = true
+  vulnerability_alerts   = false
 }
 
-resource "github_repository_environment" "repo_environment" {
-  repository  = data.github_repository.mailing-signature.name
-  environment = "prod"
+resource "github_branch" "main" {
+  repository = github_repository.mailing-signature.name
+  branch     = "main"
 }
 
-resource "github_actions_environment_secret" "aws_access_key_id" {
-  repository      = data.github_repository.mailing-signature.name
-  environment     = github_repository_environment.repo_environment.environment
+resource "github_branch" "develop" {
+  repository = github_repository.mailing-signature.name
+  branch     = "develop"
+}
+
+resource "github_branch_default" "default"{
+  repository = github_repository.mailing-signature.name
+  branch     = github_branch.main.branch
+}
+
+resource "github_actions_secret" "aws_access_key_id" {
+  repository      = github_repository.mailing-signature.name
   secret_name     = "aws_access_key_id"
   plaintext_value = "aws_iam_access_key.mailing-signature-terraform.id"
 }
 
-resource "github_actions_environment_secret" "aws_access_key_secret" {
-  repository      = data.github_repository.mailing-signature.name
-  environment     = github_repository_environment.repo_environment.environment
+resource "github_actions_secret" "aws_access_key_secret" {
+  repository      = github_repository.mailing-signature.name
   secret_name     = "aws_access_key_secret"
   plaintext_value = "aws_iam_access_key.mailing-signature-terraform.secret"
-}*/
+}
