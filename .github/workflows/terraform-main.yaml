@@ -14,79 +14,79 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
 
-      - name: infraMain Terraform Init
-        id: infraMain-init
+      - name: infra-main Terraform Init
+        id: infra-main-init
         run: terraform init
-        working-directory: infraMain
+        working-directory: infra-main
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
 
-      - name: mailingsignature Terraform Init
-        id: mailingsignature-init
+      - name: mailing-signature Terraform Init
+        id: mailing-signature-init
         run: terraform init
-        working-directory: projects/mailingsignature
+        working-directory: projects/mailing-signature
         env:
           TF_VAR_GIT_TOKEN: ${{ secrets.TF_VAR_GIT_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
 
-      - name: infraMain Terraform Format
-        id: infraMain-fmt
+      - name: infra-main Terraform Format
+        id: infra-main-fmt
         run: terraform fmt -check
-        working-directory: infraMain
+        working-directory: infra-main
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
 
-      - name: mailingsignature Terraform Format
-        id: mailingsignature-fmt
+      - name: mailing-signature Terraform Format
+        id: mailing-signature-fmt
         run: terraform fmt -check
-        working-directory: projects/mailingsignature
+        working-directory: projects/mailing-signature
         env:
           TF_VAR_GIT_TOKEN: ${{ secrets.TF_VAR_GIT_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
 
-      - name: infraMain Terraform Validate
-        id: infraMain-validate
+      - name: infra-main Terraform Validate
+        id: infra-main-validate
         run: terraform validate -no-color
-        working-directory: infraMain
+        working-directory: infra-main
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
 
-      - name: mailingsignature Terraform Validate
-        id: mailingsignature-validate
+      - name: mailing-signature Terraform Validate
+        id: mailing-signature-validate
         run: terraform validate -no-color
-        working-directory: projects/mailingsignature
+        working-directory: projects/mailing-signature
         env:
           TF_VAR_GIT_TOKEN: ${{ secrets.TF_VAR_GIT_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
 
-      - name: infraMain Terraform Plan
-        id: infraMain-plan
+      - name: infra-main Terraform Plan
+        id: infra-main-plan
         if: github.event_name == 'pull_request'
         run: terraform plan -no-color
-        working-directory: infraMain
+        working-directory: infra-main
         continue-on-error: true
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
 
-      - name: mailingsignature Terraform Plan
-        id: mailingsignature-plan
+      - name: mailing-signature Terraform Plan
+        id: mailing-signature-plan
         if: github.event_name == 'pull_request'
         run: terraform plan -no-color
-        working-directory: projects/mailingsignature
+        working-directory: projects/mailing-signature
         continue-on-error: true
         env:
           TF_VAR_GIT_TOKEN: ${{ secrets.TF_VAR_GIT_TOKEN }}
@@ -98,32 +98,32 @@ jobs:
         uses: actions/github-script@v4
         if: github.event_name == 'pull_request'
         env:
-          PLAN_MAININFRA: "terraform\n${{ steps.infraMain-plan.outputs.stdout }}"
-          PLAN_MAILINGSIGNATURE: "terraform\n${{ steps.mailingsignature-plan.outputs.stdout }}"
+          PLAN_MAIN_INFRA: "terraform\n${{ steps.infra-main-plan.outputs.stdout }}"
+          PLAN_MAILING_SIGNATURE: "terraform\n${{ steps.mailing-signature-plan.outputs.stdout }}"
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const output = `#### Terraform infraMain Format and Style 🖌\`${{ steps.infraMain-fmt.outcome }}\`
-            #### Terraform mailingsignature Format and Style 🖌\`${{ steps.mailingsignature-fmt.outcome }}\`
-            #### Terraform infraMain Initialization ⚙️\`${{ steps.infraMain-init.outcome }}\`
-            #### Terraform mailingsignature Initialization ⚙️\`${{ steps.mailingsignature-init.outcome }}\`
-            #### Terraform infraMain Plan 📖\`${{ steps.infraMain-plan.outcome }}\`
-            #### Terraform mailingsignature Plan 📖\`${{ steps.mailingsignature-plan.outcome }}\`
-            #### Terraform infraMain Validation 🤖\`${{ steps.infraMain-validate.outcome }}\`
-            #### Terraform mailingsignature Validation 🤖\`${{ steps.mailingsignature-validate.outcome }}\`
+            const output = `#### Terraform infra-main Format and Style 🖌\`${{ steps.infra-main-fmt.outcome }}\`
+            #### Terraform mailing-signature Format and Style 🖌\`${{ steps.mailing-signature-fmt.outcome }}\`
+            #### Terraform infra-main Initialization ⚙️\`${{ steps.infra-main-init.outcome }}\`
+            #### Terraform mailing-signature Initialization ⚙️\`${{ steps.mailing-signature-init.outcome }}\`
+            #### Terraform infra-main Plan 📖\`${{ steps.infra-main-plan.outcome }}\`
+            #### Terraform mailing-signature Plan 📖\`${{ steps.mailing-signature-plan.outcome }}\`
+            #### Terraform infra-main Validation 🤖\`${{ steps.infra-main-validate.outcome }}\`
+            #### Terraform mailing-signature Validation 🤖\`${{ steps.mailing-signature-validate.outcome }}\`
 
-            <details><summary>Show infraMain Plan</summary>
+            <details><summary>Show infra-main Plan</summary>
 
             \`\`\`\n
-            ${process.env.PLAN_MAININFRA}
+            ${process.env.PLAN_MAIN_INFRA}
             \`\`\`
 
             </details>
 
-            <details><summary>Show mailingSignature Plan</summary>
+            <details><summary>Show mailing-signature Plan</summary>
 
             \`\`\`\n
-            ${process.env.PLAN_MAILINGSIGNATURE}
+            ${process.env.PLAN_MAILING_SIGNATURE}
             \`\`\`
 
             </details>
@@ -138,22 +138,22 @@ jobs:
             })
 
       - name: Terraform Plan Status
-        if: (steps.infraMain-plan.outcome || steps.mailingsignature-plan.outcome) == 'failure'
+        if: (steps.infra-main-plan.outcome || steps.mailing-signature-plan.outcome) == 'failure'
         run: exit 1
 
-      - name: infraMain Terraform Apply
+      - name: infra-main Terraform Apply
         if: github.ref == 'refs/heads/master' && github.event_name == 'push'
         run: terraform apply -auto-approve
-        working-directory: infraMain
+        working-directory: infra-main
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
 
-      - name: mailingsignature Terraform Apply
+      - name: mailing-signature Terraform Apply
         if: github.ref == 'refs/heads/master' && github.event_name == 'push'
         run: terraform apply -auto-approve
-        working-directory: projects/mailingsignature
+        working-directory: projects/mailing-signature
         env:
           TF_VAR_GIT_TOKEN: ${{ secrets.TF_VAR_GIT_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}

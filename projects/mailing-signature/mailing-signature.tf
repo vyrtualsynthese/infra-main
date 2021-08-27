@@ -3,7 +3,7 @@ terraform {
   backend "s3" {
     encrypt        = true
     bucket         = "ashudev-tf-states"
-    key            = "projects/mailingsignature.tfstate"
+    key            = "projects/mailing-signature.tfstate"
     dynamodb_table = "tf-main-lock"
   }
 
@@ -27,7 +27,7 @@ provider "github" {
   token = var.GIT_TOKEN
 }
 
-resource "aws_s3_bucket" "mailingsignature" {
+resource "aws_s3_bucket" "mailing-signature" {
   bucket = "mailingsignature"
   acl    = "public-read"
   policy = jsonencode({
@@ -43,19 +43,15 @@ resource "aws_s3_bucket" "mailingsignature" {
     ]
   })
   tags = {
-    project = "mailingsignature"
+    project = "mailing-signature"
   }
 }
 
-data "aws_s3_bucket" "mailingsignature" {
-  bucket = "mailingsignature"
-}
-
-resource "aws_iam_policy" "mailingsignature" {
-  name = "mailingsignature"
+resource "aws_iam_policy" "mailing-signature" {
+  name = "mailing-signature"
   path = "/projects/"
   tags = {
-    "project" = "mailingsignature"
+    "project" = "mailing-signature"
   }
 
   policy = jsonencode({
@@ -66,62 +62,62 @@ resource "aws_iam_policy" "mailingsignature" {
           "s3:*",
         ]
         Effect   = "Allow"
-        Resource = data.aws_s3_bucket.mailingsignature.arn
+        Resource = aws_s3_bucket.mailing-signature.arn
       },
     ]
   })
 }
 
-resource "aws_iam_user" "mailingsignature-terraform" {
-  name = "mailingsignature-terraform"
-  path = "/projects/mailingsignature/"
+resource "aws_iam_user" "mailing-signature-terraform" {
+  name = "mailing-signature-terraform"
+  path = "/projects/mailing-signature/"
   tags = {
-    project = "mailingsignature"
+    project = "mailing-signature"
   }
 }
 
-resource "aws_iam_access_key" "mailingsignature-terraform" {
-  user = aws_iam_user.mailingsignature-terraform.name
+resource "aws_iam_access_key" "mailing-signature-terraform" {
+  user = aws_iam_user.mailing-signature-terraform.name
 }
 
-resource "aws_iam_group" "mailingsignature" {
-  name = "mailingsignature"
-  path = "/projects/mailingsignature/"
+resource "aws_iam_group" "mailing-signature" {
+  name = "mailing-signature"
+  path = "/projects/mailing-signature/"
 }
 
-resource "aws_iam_group_membership" "mailingsignature" {
-  name = "tf-mailingsignature-group-membership"
+resource "aws_iam_group_membership" "mailing-signature" {
+  name = "tf-mailing-signature-group-membership"
   users = [
-    aws_iam_user.mailingsignature-terraform.name,
+    aws_iam_user.mailing-signature-terraform.name,
   ]
 
-  group = aws_iam_group.mailingsignature.name
+  group = aws_iam_group.mailing-signature.name
 }
 
-resource "aws_iam_group_policy_attachment" "mailingsignature" {
-  group      = aws_iam_group.mailingsignature.name
-  policy_arn = aws_iam_policy.mailingsignature.arn
+resource "aws_iam_group_policy_attachment" "mailing-signature" {
+  group      = aws_iam_group.mailing-signature.name
+  policy_arn = aws_iam_policy.mailing-signature.arn
 }
 
-data "github_repository" "mailingsignature" {
+/*data "github_repository" "mailing-signature" {
   full_name = "vyrtualsynthese/ashudevWebsite"
 }
 
 resource "github_repository_environment" "repo_environment" {
-  repository  = data.github_repository.mailingsignature.name
+  repository  = data.github_repository.mailing-signature.name
   environment = "prod"
 }
 
 resource "github_actions_environment_secret" "aws_access_key_id" {
-  repository      = data.github_repository.mailingsignature.name
+  repository      = data.github_repository.mailing-signature.name
   environment     = github_repository_environment.repo_environment.environment
   secret_name     = "aws_access_key_id"
-  plaintext_value = "aws_iam_access_key.mailingsignature-terraform.id"
+  plaintext_value = "aws_iam_access_key.mailing-signature-terraform.id"
 }
 
 resource "github_actions_environment_secret" "aws_access_key_secret" {
-  repository      = data.github_repository.mailingsignature.name
+  repository      = data.github_repository.mailing-signature.name
   environment     = github_repository_environment.repo_environment.environment
   secret_name     = "aws_access_key_secret"
-  plaintext_value = "aws_iam_access_key.mailingsignature-terraform.secret"
-}
+  plaintext_value = "aws_iam_access_key.mailing-signature-terraform.secret"
+}*/
