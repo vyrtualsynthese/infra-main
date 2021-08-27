@@ -124,7 +124,7 @@ resource "github_branch" "develop" {
   branch     = "develop"
 }
 
-resource "github_branch_default" "default"{
+resource "github_branch_default" "default" {
   repository = github_repository.mailing-signature.name
   branch     = github_branch.main.branch
 }
