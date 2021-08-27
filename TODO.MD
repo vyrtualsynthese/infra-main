@@ -4,6 +4,7 @@
 + How to use github docker repo
 + Manage billing and cloud watch budget alerts via terraform
 
++ Migrate ashudev signature with right name
 + Create config for ashuvidzWebsite
 
 LATER:

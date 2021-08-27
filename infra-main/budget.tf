@@ -3,7 +3,7 @@ terraform {
   backend "s3" {
     encrypt        = true
     bucket         = "ashudev-tf-states"
-    key            = "projects/budget.tfstate"
+    key            = "budget.tfstate"
     dynamodb_table = "tf-main-lock"
   }
 
