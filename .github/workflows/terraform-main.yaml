@@ -5,7 +5,7 @@ on:
       - master
   pull_request:
 jobs:
-  Apply-Terraform-Main:
+  Terraform-Main:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository code
@@ -56,7 +56,7 @@ jobs:
         uses: actions/github-script@v4
         if: github.event_name == 'pull_request'
         env:
-          PLAN_MAIN_INFRA: "terraform\n${{ steps.infra-main-plan.outputs.stdout }}"
+          PLAN_MAIN_INFRA: "infra-main\n${{ steps.infra-main-plan.outputs.stdout }}"
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
@@ -82,7 +82,7 @@ jobs:
               body: output
             })
 
-      - name: Terraform Plan Status
+      - name: infra-main Plan Status
         if: steps.infra-main-plan.outcome == 'failure'
         run: exit 1
 
@@ -95,8 +95,8 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
 
-  Apply-Terraform-mailing-signature:
-    needs: Apply-Terraform-Main
+  Terraform-mailing-signature:
+    needs: Terraform-Main
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository code
@@ -151,14 +151,14 @@ jobs:
         uses: actions/github-script@v4
         if: github.event_name == 'pull_request'
         env:
-          PLAN_MAILING_SIGNATURE: "terraform\n${{ steps.mailing-signature-plan.outputs.stdout }}"
+          PLAN_MAILING_SIGNATURE: "mailing-signature\n${{ steps.mailing-signature-plan.outputs.stdout }}"
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const output = #### Terraform mailing-signature Format and Style 🖌\`${{ steps.mailing-signature-fmt.outcome }}\`
-            #### Terraform mailing-signature Initialization ⚙️\`${{ steps.mailing-signature-init.outcome }}\`
-            #### Terraform mailing-signature Plan 📖\`${{ steps.mailing-signature-plan.outcome }}\`
-            #### Terraform mailing-signature Validation 🤖\`${{ steps.mailing-signature-validate.outcome }}\`
+            const output = `#### Terraform infra-main Format and Style 🖌\`${{ steps.mailing-signature-fmt.outcome }}\`
+            #### Terraform infra-main Initialization ⚙️\`${{ steps.mailing-signature-init.outcome }}\`
+            #### Terraform infra-main Plan 📖\`${{ steps.mailing-signature-plan.outcome }}\`
+            #### Terraform infra-main Validation 🤖\`${{ steps.mailing-signature-validate.outcome }}\`
 
             <details><summary>Show mailing-signature Plan</summary>
 
@@ -177,7 +177,7 @@ jobs:
               body: output
             })
 
-      - name: Terraform Plan Status
+      - name: mailing-signature Plan Status
         if: steps.mailing-signature-plan.outcome == 'failure'
         run: exit 1
 
