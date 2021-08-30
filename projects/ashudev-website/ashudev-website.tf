@@ -31,19 +31,30 @@ resource "aws_s3_bucket" "ashudev-website" {
   bucket = "ashudev-website"
   acl    = "public-read"
   policy = jsonencode({
-    "Version" : "2012-10-17",
-    "Statement" : [
+    "Version": "2012-10-17",
+    "Statement": [
       {
-        Sid : "PublicReadGetObject",
-        Effect : "Allow",
-        Principal : "*",
-        Action : "s3:*",
+        Sid: "PublicReadGetObject",
+        Effect: "Allow",
+        Principal: "*",
+        Action: "s3:GetObject",
         Resource : "arn:aws:s3:::ashudev-website/*"
       }
     ]
   })
+  server_side_encryption_configuration {
+    rule {
+      bucket_key_enabled = "false"
+      apply_server_side_encryption_by_default {
+        sse_algorithm = "AES256"
+      }
+    }
+  }
   tags = {
     project = "ashudev-website"
+  }
+  website {
+    index_document = "index.html"
   }
 }
 
@@ -102,9 +113,9 @@ resource "aws_iam_group_policy_attachment" "mailing-signature" {
 }
 */
 
-resource "github_repository" "mailing-signature" {
-  name                   = "mailing-signature"
-  visibility             = "private"
+resource "github_repository" "ashudev-website" {
+  name                   = "ashudev-website"
+  visibility             = "public"
   has_issues             = false
   has_downloads          = false
   has_wiki               = false
@@ -116,12 +127,16 @@ resource "github_repository" "mailing-signature" {
   archive_on_destroy     = true
   vulnerability_alerts   = false
   auto_init              = true
+  template {
+    owner = "vyrtualsynthese"
+    repository = "nodejs-docker-typescript-boilerplate"
+  }
 }
 
 resource "github_branch" "develop" {
-  repository = github_repository.mailing-signature.name
+  repository = github_repository.ashudev-website.name
   branch     = "develop"
-
+}
 
 /*
 resource "github_actions_secret" "aws_access_key_id" {
