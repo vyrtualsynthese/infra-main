@@ -37,7 +37,7 @@ resource "aws_s3_bucket" "mailing-signature" {
         Sid : "PublicReadGetObject",
         Effect : "Allow",
         Principal : "*",
-        Action: "s3:GetObject",
+        Action : "s3:GetObject",
         Resource : "arn:aws:s3:::mailingsignature/*"
       }
     ]

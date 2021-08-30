@@ -31,13 +31,13 @@ resource "aws_s3_bucket" "ashudev-website" {
   bucket = "ashudev-website"
   acl    = "public-read"
   policy = jsonencode({
-    "Version": "2012-10-17",
-    "Statement": [
+    "Version" : "2012-10-17",
+    "Statement" : [
       {
-        Sid: "PublicReadGetObject",
-        Effect: "Allow",
-        Principal: "*",
-        Action: "s3:GetObject",
+        Sid : "PublicReadGetObject",
+        Effect : "Allow",
+        Principal : "*",
+        Action : "s3:GetObject",
         Resource : "arn:aws:s3:::ashudev-website/*"
       }
     ]
@@ -128,7 +128,7 @@ resource "github_repository" "ashudev-website" {
   vulnerability_alerts   = false
   auto_init              = true
   template {
-    owner = "vyrtualsynthese"
+    owner      = "vyrtualsynthese"
     repository = "nodejs-docker-typescript-boilerplate"
   }
 }
