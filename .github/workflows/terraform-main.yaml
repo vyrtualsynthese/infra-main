@@ -23,21 +23,94 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
 
+      - name: infra-main Terraform Format
+        id: infra-main-fmt
+        run: terraform fmt -check
+        working-directory: infra-main
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+
+      - name: infra-main Terraform Validate
+        id: infra-main-validate
+        run: terraform validate -no-color
+        working-directory: infra-main
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+
+      - name: infra-main Terraform Plan
+        id: infra-main-plan
+        if: github.event_name == 'pull_request'
+        run: terraform plan -no-color
+        working-directory: infra-main
+        continue-on-error: true
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+
+      - name: Update Pull Request
+        uses: actions/github-script@v4
+        if: github.event_name == 'pull_request'
+        env:
+          PLAN_MAIN_INFRA: "terraform\n${{ steps.infra-main-plan.outputs.stdout }}"
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const output = `#### Terraform infra-main Format and Style 🖌\`${{ steps.infra-main-fmt.outcome }}\`
+            #### Terraform infra-main Initialization ⚙️\`${{ steps.infra-main-init.outcome }}\`
+            #### Terraform infra-main Plan 📖\`${{ steps.infra-main-plan.outcome }}\`
+            #### Terraform infra-main Validation 🤖\`${{ steps.infra-main-validate.outcome }}\`
+
+            <details><summary>Show infra-main Plan</summary>
+
+            \`\`\`\n
+            ${process.env.PLAN_MAIN_INFRA}
+            \`\`\`
+
+            </details>
+
+            *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
+
+            github.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            })
+
+      - name: Terraform Plan Status
+        if: steps.infra-main-plan.outcome == 'failure'
+        run: exit 1
+
+      - name: infra-main Terraform Apply
+        if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+        run: terraform apply -auto-approve
+        working-directory: infra-main
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+
+  Apply-Terraform-mailing-signature:
+    needs: Apply-Terraform-Main
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v2
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+
       - name: mailing-signature Terraform Init
         id: mailing-signature-init
         run: terraform init
         working-directory: projects/mailing-signature
         env:
           TF_VAR_GIT_TOKEN: ${{ secrets.TF_VAR_GIT_TOKEN }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-
-      - name: infra-main Terraform Format
-        id: infra-main-fmt
-        run: terraform fmt -check
-        working-directory: infra-main
-        env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
@@ -52,32 +125,12 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
 
-      - name: infra-main Terraform Validate
-        id: infra-main-validate
-        run: terraform validate -no-color
-        working-directory: infra-main
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-
       - name: mailing-signature Terraform Validate
         id: mailing-signature-validate
         run: terraform validate -no-color
         working-directory: projects/mailing-signature
         env:
           TF_VAR_GIT_TOKEN: ${{ secrets.TF_VAR_GIT_TOKEN }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-
-      - name: infra-main Terraform Plan
-        id: infra-main-plan
-        if: github.event_name == 'pull_request'
-        run: terraform plan -no-color
-        working-directory: infra-main
-        continue-on-error: true
-        env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
@@ -98,27 +151,14 @@ jobs:
         uses: actions/github-script@v4
         if: github.event_name == 'pull_request'
         env:
-          PLAN_MAIN_INFRA: "terraform\n${{ steps.infra-main-plan.outputs.stdout }}"
           PLAN_MAILING_SIGNATURE: "terraform\n${{ steps.mailing-signature-plan.outputs.stdout }}"
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const output = `#### Terraform infra-main Format and Style 🖌\`${{ steps.infra-main-fmt.outcome }}\`
-            #### Terraform mailing-signature Format and Style 🖌\`${{ steps.mailing-signature-fmt.outcome }}\`
-            #### Terraform infra-main Initialization ⚙️\`${{ steps.infra-main-init.outcome }}\`
+            const output = #### Terraform mailing-signature Format and Style 🖌\`${{ steps.mailing-signature-fmt.outcome }}\`
             #### Terraform mailing-signature Initialization ⚙️\`${{ steps.mailing-signature-init.outcome }}\`
-            #### Terraform infra-main Plan 📖\`${{ steps.infra-main-plan.outcome }}\`
             #### Terraform mailing-signature Plan 📖\`${{ steps.mailing-signature-plan.outcome }}\`
-            #### Terraform infra-main Validation 🤖\`${{ steps.infra-main-validate.outcome }}\`
             #### Terraform mailing-signature Validation 🤖\`${{ steps.mailing-signature-validate.outcome }}\`
-
-            <details><summary>Show infra-main Plan</summary>
-
-            \`\`\`\n
-            ${process.env.PLAN_MAIN_INFRA}
-            \`\`\`
-
-            </details>
 
             <details><summary>Show mailing-signature Plan</summary>
 
@@ -138,17 +178,8 @@ jobs:
             })
 
       - name: Terraform Plan Status
-        if: (steps.infra-main-plan.outcome || steps.mailing-signature-plan.outcome) == 'failure'
+        if: steps.mailing-signature-plan.outcome == 'failure'
         run: exit 1
-
-      - name: infra-main Terraform Apply
-        if: github.ref == 'refs/heads/master' && github.event_name == 'push'
-        run: terraform apply -auto-approve
-        working-directory: infra-main
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
 
       - name: mailing-signature Terraform Apply
         if: github.ref == 'refs/heads/master' && github.event_name == 'push'
