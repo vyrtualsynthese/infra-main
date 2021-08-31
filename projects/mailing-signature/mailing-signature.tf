@@ -39,6 +39,13 @@ resource "aws_s3_bucket" "mailing-signature" {
         Principal : "*",
         Action : "s3:GetObject",
         Resource : "arn:aws:s3:::mailingsignature/*"
+      },
+      {
+        Sid : "PublicReadGetObject",
+        Effect : "Allow",
+        Principal : aws_iam_user.mailing-signature-terraform.arn,
+        Action : "s3:*",
+        Resource : "arn:aws:s3:::mailingsignature/*"
       }
     ]
   })
