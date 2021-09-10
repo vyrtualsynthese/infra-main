@@ -39,6 +39,15 @@ resource "aws_s3_bucket" "ashudev-website" {
         Principal : "*",
         Action : "s3:GetObject",
         Resource : "arn:aws:s3:::ashudev-website/*"
+      },
+      {
+        Sid : "PublicReadGetObject",
+        Effect : "Allow",
+        Principal : {
+          "AWS" : aws_iam_user.ashudev-website-terraform.arn
+        },
+        Action : "s3:*",
+        Resource : "arn:aws:s3:::mailingsignature/*"
       }
     ]
   })
@@ -58,11 +67,11 @@ resource "aws_s3_bucket" "ashudev-website" {
   }
 }
 
-/*resource "aws_iam_policy" "mailing-signature" {
-  name = "mailing-signature"
+resource "aws_iam_policy" "ashudev-website" {
+  name = "ashudev-website"
   path = "/projects/"
   tags = {
-    "project" = "mailing-signature"
+    "project" = "ashudev-website"
   }
 
   policy = jsonencode({
@@ -73,19 +82,19 @@ resource "aws_s3_bucket" "ashudev-website" {
           "s3:*",
         ]
         Effect   = "Allow"
-        Resource = aws_s3_bucket.mailing-signature.arn
+        Resource = aws_s3_bucket.ashudev-website.arn
       },
     ]
   })
 }
 
-resource "aws_iam_user" "mailing-signature-terraform" {
-  name = "mailing-signature-terraform"
-  path = "/projects/mailing-signature/"
+resource "aws_iam_user" "ashudev-website-terraform" {
+  name = "ashudev-website-terraform"
+  path = "/projects/ashudev-website/"
   tags = {
-    project = "mailing-signature"
+    project = "ashudev-website"
   }
-}*/
+}
 
 /* access key not working atm
 resource "aws_iam_access_key" "mailing-signature-terraform" {
@@ -93,25 +102,24 @@ resource "aws_iam_access_key" "mailing-signature-terraform" {
 }
 */
 
-/*resource "aws_iam_group" "mailing-signature" {
-  name = "mailing-signature"
-  path = "/projects/mailing-signature/"
+resource "aws_iam_group" "ashudev-website" {
+  name = "ashudev-website"
+  path = "/projects/ashudev-website/"
 }
 
-resource "aws_iam_group_membership" "mailing-signature" {
-  name = "tf-mailing-signature-group-membership"
+resource "aws_iam_group_membership" "ashudev-website" {
+  name = "tf-ashudev-website-group-membership"
   users = [
-    aws_iam_user.mailing-signature-terraform.name,
+    aws_iam_user.ashudev-website-terraform.name,
   ]
 
-  group = aws_iam_group.mailing-signature.name
+  group = aws_iam_group.ashudev-website.name
 }
 
-resource "aws_iam_group_policy_attachment" "mailing-signature" {
-  group      = aws_iam_group.mailing-signature.name
-  policy_arn = aws_iam_policy.mailing-signature.arn
+resource "aws_iam_group_policy_attachment" "ashudev-website" {
+  group      = aws_iam_group.ashudev-website.name
+  policy_arn = aws_iam_policy.ashudev-website.arn
 }
-*/
 
 resource "github_repository" "ashudev-website" {
   name                   = "ashudev-website"
