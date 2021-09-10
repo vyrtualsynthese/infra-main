@@ -156,9 +156,9 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const output = `#### Terraform infra-main Format and Style 🖌\`${{ steps.mailing-signature-fmt.outcome }}\`
-            #### Terraform infra-main Initialization ⚙️\`${{ steps.mailing-signature-init.outcome }}\`
-            #### Terraform infra-main Plan 📖\`${{ steps.mailing-signature-plan.outcome }}\`
-            #### Terraform infra-main Validation 🤖\`${{ steps.mailing-signature-validate.outcome }}\`
+            #### Terraform mailing-signature Initialization ⚙️\`${{ steps.mailing-signature-init.outcome }}\`
+            #### Terraform mailing-signature Plan 📖\`${{ steps.mailing-signature-plan.outcome }}\`
+            #### Terraform mailing-signature Validation 🤖\`${{ steps.mailing-signature-validate.outcome }}\`
 
             <details><summary>Show mailing-signature Plan</summary>
 
@@ -185,6 +185,101 @@ jobs:
         if: github.ref == 'refs/heads/master' && github.event_name == 'push'
         run: terraform apply -auto-approve
         working-directory: projects/mailing-signature
+        env:
+          TF_VAR_GIT_TOKEN: ${{ secrets.TF_VAR_GIT_TOKEN }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+  Terraform-ashudev-websitee:
+    needs: Terraform-Main
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v2
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+
+      - name: ashudev-website Terraform Init
+        id: ashudev-website-init
+        run: terraform init
+        working-directory: projects/ashudev-website
+        env:
+          TF_VAR_GIT_TOKEN: ${{ secrets.TF_VAR_GIT_TOKEN }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+
+      - name: ashudev-website Terraform Format
+        id: ashudev-website-fmt
+        run: terraform fmt -check
+        working-directory: projects/ashudev-website
+        env:
+          TF_VAR_GIT_TOKEN: ${{ secrets.TF_VAR_GIT_TOKEN }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+
+      - name: ashudev-website Terraform Validate
+        id: ashudev-website-validate
+        run: terraform validate -no-color
+        working-directory: projects/ashudev-website
+        env:
+          TF_VAR_GIT_TOKEN: ${{ secrets.TF_VAR_GIT_TOKEN }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+
+      - name: ashudev-website Terraform Plan
+        id: ashudev-website-plan
+        if: github.event_name == 'pull_request'
+        run: terraform plan -no-color
+        working-directory: projects/ashudev-website
+        continue-on-error: true
+        env:
+          TF_VAR_GIT_TOKEN: ${{ secrets.TF_VAR_GIT_TOKEN }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+
+      - name: Update Pull Request
+        uses: actions/github-script@v4
+        if: github.event_name == 'pull_request'
+        env:
+          PLAN_ASHUDEV_WEBSITE: "ashudev-website\n${{ steps.ashudev-website-plan.outputs.stdout }}"
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const output = `#### Terraform ashudev-website Format and Style 🖌\`${{ steps.ashudev-website-fmt.outcome }}\`
+            #### Terraform ashudev-website Initialization ⚙️\`${{ steps.ashudev-website-init.outcome }}\`
+            #### Terraform ashudev-website Plan 📖\`${{ steps.ashudev-website-plan.outcome }}\`
+            #### Terraform ashudev-website Validation 🤖\`${{ steps.ashudev-website-validate.outcome }}\`
+
+            <details><summary>Show ashudev-website Plan</summary>
+
+            \`\`\`\n
+            ${process.env.PLAN_ASHUDEV_WEBSITE}
+            \`\`\`
+
+            </details>
+
+            *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
+
+            github.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            })
+
+      - name: ashudev-website Plan Status
+        if: steps.ashudev-website-plan.outcome == 'failure'
+        run: exit 1
+
+      - name: ashudev-website Terraform Apply
+        if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+        run: terraform apply -auto-approve
+        working-directory: projects/ashudev-website
         env:
           TF_VAR_GIT_TOKEN: ${{ secrets.TF_VAR_GIT_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
