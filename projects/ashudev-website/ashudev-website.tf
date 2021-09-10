@@ -47,7 +47,7 @@ resource "aws_s3_bucket" "ashudev-website" {
           "AWS" : aws_iam_user.ashudev-website-terraform.arn
         },
         Action : "s3:*",
-        Resource : "arn:aws:s3:::mailingsignature/*"
+        Resource : "arn:aws:s3:::ashudev-website/*"
       }
     ]
   })
