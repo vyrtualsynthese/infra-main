@@ -155,7 +155,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const output = `#### Terraform infra-main Format and Style 🖌\`${{ steps.mailing-signature-fmt.outcome }}\`
+            const output = `#### Terraform mailing-signature Format and Style 🖌\`${{ steps.mailing-signature-fmt.outcome }}\`
             #### Terraform mailing-signature Initialization ⚙️\`${{ steps.mailing-signature-init.outcome }}\`
             #### Terraform mailing-signature Plan 📖\`${{ steps.mailing-signature-plan.outcome }}\`
             #### Terraform mailing-signature Validation 🤖\`${{ steps.mailing-signature-validate.outcome }}\`
