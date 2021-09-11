@@ -5,7 +5,7 @@ on:
       - master
   pull_request:
 jobs:
-  Terraform-Main:
+  Terraform-Main-budget:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository code
@@ -14,38 +14,38 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
 
-      - name: infra-main Terraform Init
-        id: infra-main-init
+      - name: infra-main-budget Terraform Init
+        id: infra-main-budget-init
         run: terraform init
-        working-directory: infra-main
+        working-directory: infra-main/budget
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
 
-      - name: infra-main Terraform Format
-        id: infra-main-fmt
+      - name: infra-main-budget Terraform Format
+        id: infra-main-budget-fmt
         run: terraform fmt -check
-        working-directory: infra-main
+        working-directory: infra-main/budget
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
 
-      - name: infra-main Terraform Validate
-        id: infra-main-validate
+      - name: infra-main-budget Terraform Validate
+        id: infra-main-budget-validate
         run: terraform validate -no-color
-        working-directory: infra-main
+        working-directory: infra-main/budget
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
 
-      - name: infra-main Terraform Plan
-        id: infra-main-plan
+      - name: infra-main-budget Terraform Plan
+        id: infra-main-budget-plan
         if: github.event_name == 'pull_request'
         run: terraform plan -no-color
-        working-directory: infra-main
+        working-directory: infra-main/budget
         continue-on-error: true
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -56,19 +56,19 @@ jobs:
         uses: actions/github-script@v4
         if: github.event_name == 'pull_request'
         env:
-          PLAN_MAIN_INFRA: "infra-main\n${{ steps.infra-main-plan.outputs.stdout }}"
+          PLAN_MAIN_BUDGET_INFRA: "infra-main-budget-budget\n${{ steps.infra-main-budget-plan.outputs.stdout }}"
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const output = `#### Terraform infra-main Format and Style 🖌\`${{ steps.infra-main-fmt.outcome }}\`
-            #### Terraform infra-main Initialization ⚙️\`${{ steps.infra-main-init.outcome }}\`
-            #### Terraform infra-main Plan 📖\`${{ steps.infra-main-plan.outcome }}\`
-            #### Terraform infra-main Validation 🤖\`${{ steps.infra-main-validate.outcome }}\`
+            const output = `#### Terraform infra-main-budget Format and Style 🖌\`${{ steps.infra-main-budget-fmt.outcome }}\`
+            #### Terraform infra-main-budget Initialization ⚙️\`${{ steps.infra-main-budget-init.outcome }}\`
+            #### Terraform infra-main-budget Plan 📖\`${{ steps.infra-main-budget-plan.outcome }}\`
+            #### Terraform infra-main-budget Validation 🤖\`${{ steps.infra-main-budget-validate.outcome }}\`
 
-            <details><summary>Show infra-main Plan</summary>
+            <details><summary>Show infra-main-budget Plan</summary>
 
             \`\`\`\n
-            ${process.env.PLAN_MAIN_INFRA}
+            ${process.env.PLAN_MAIN_BUDGET_INFRA}
             \`\`\`
 
             </details>
@@ -82,14 +82,14 @@ jobs:
               body: output
             })
 
-      - name: infra-main Plan Status
-        if: steps.infra-main-plan.outcome == 'failure'
+      - name: infra-main-budget Plan Status
+        if: steps.infra-main-budget-plan.outcome == 'failure'
         run: exit 1
 
-      - name: infra-main Terraform Apply
+      - name: infra-main-budget Terraform Apply
         if: github.ref == 'refs/heads/master' && github.event_name == 'push'
         run: terraform apply -auto-approve
-        working-directory: infra-main
+        working-directory: infra-main/budget
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
