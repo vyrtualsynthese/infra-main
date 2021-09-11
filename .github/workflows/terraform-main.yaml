@@ -96,7 +96,8 @@ jobs:
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
 
   Terraform-mailing-signature:
-    needs: Terraform-Main
+    needs:
+      - Terraform-Main-budget
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository code
@@ -191,7 +192,8 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
   Terraform-ashudev-website:
-    needs: Terraform-Main
+    needs:
+      - Terraform-Main-budget
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository code
