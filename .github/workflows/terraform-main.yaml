@@ -5,8 +5,11 @@ on:
       - master
   pull_request:
 jobs:
-  Terraform-Main-budget:
+  Terraform-Main:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        project: [ budget, route53 ]
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2
@@ -14,38 +17,38 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
 
-      - name: infra-main-budget Terraform Init
-        id: infra-main-budget-init
+      - name: Terraform Init
+        id: infra-main-init
         run: terraform init
-        working-directory: infra-main/budget
+        working-directory: infra-main/${{ matrix.project }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
 
-      - name: infra-main-budget Terraform Format
-        id: infra-main-budget-fmt
+      - name: Terraform Format
+        id: infra-main-fmt
         run: terraform fmt -check
-        working-directory: infra-main/budget
+        working-directory: infra-main/${{ matrix.project }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
 
-      - name: infra-main-budget Terraform Validate
-        id: infra-main-budget-validate
+      - name: Terraform Validate
+        id: infra-main-validate
         run: terraform validate -no-color
-        working-directory: infra-main/budget
+        working-directory: infra-main/${{ matrix.project }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
 
-      - name: infra-main-budget Terraform Plan
-        id: infra-main-budget-plan
+      - name: Terraform Plan
+        id: infra-main-plan
         if: github.event_name == 'pull_request'
         run: terraform plan -no-color
-        working-directory: infra-main/budget
+        working-directory: infra-main/${{ matrix.project }}
         continue-on-error: true
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -56,19 +59,19 @@ jobs:
         uses: actions/github-script@v4
         if: github.event_name == 'pull_request'
         env:
-          PLAN_MAIN_BUDGET_INFRA: "infra-main-budget-budget\n${{ steps.infra-main-budget-plan.outputs.stdout }}"
+          PLAN_MAIN_INFRA: "Infra Main ${{ matrix.project }}\n${{ steps.infra-main-plan.outputs.stdout }}"
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const output = `#### Terraform infra-main-budget Format and Style 🖌\`${{ steps.infra-main-budget-fmt.outcome }}\`
-            #### Terraform infra-main-budget Initialization ⚙️\`${{ steps.infra-main-budget-init.outcome }}\`
-            #### Terraform infra-main-budget Plan 📖\`${{ steps.infra-main-budget-plan.outcome }}\`
-            #### Terraform infra-main-budget Validation 🤖\`${{ steps.infra-main-budget-validate.outcome }}\`
+            const output = `#### Terraform Infra Main ${{ matrix.project }} Format and Style 🖌\`${{ steps.infra-main-fmt.outcome }}\`
+            #### Terraform Infra Main ${{ matrix.project }} Initialization ⚙️\`${{ steps.infra-main-init.outcome }}\`
+            #### Terraform Infra Main ${{ matrix.project }} Plan 📖\`${{ steps.infra-main-plan.outcome }}\`
+            #### Terraform Infra Main ${{ matrix.project }} Validation 🤖\`${{ steps.infra-main-validate.outcome }}\`
 
-            <details><summary>Show infra-main-budget Plan</summary>
+            <details><summary>Show Infra Main ${{ matrix.project }} Plan</summary>
 
             \`\`\`\n
-            ${process.env.PLAN_MAIN_BUDGET_INFRA}
+            ${process.env.PLAN_MAIN_INFRA}
             \`\`\`
 
             </details>
@@ -82,23 +85,26 @@ jobs:
               body: output
             })
 
-      - name: infra-main-budget Plan Status
-        if: steps.infra-main-budget-plan.outcome == 'failure'
+      - name: Plan Status
+        if: steps.infra-main-plan.outcome == 'failure'
         run: exit 1
 
-      - name: infra-main-budget Terraform Apply
+      - name: Terraform Apply
         if: github.ref == 'refs/heads/master' && github.event_name == 'push'
         run: terraform apply -auto-approve
-        working-directory: infra-main/budget
+        working-directory: infra-main/${{ matrix.project }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
 
-  Terraform-mailing-signature:
+  Terraform-Project:
     needs:
-      - Terraform-Main-budget
+      - Terraform-Main
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        project: [ ashudev-website, mailing-signature ]
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2
@@ -106,41 +112,41 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
 
-      - name: mailing-signature Terraform Init
-        id: mailing-signature-init
+      - name: Terraform Init
+        id: project-init
         run: terraform init
-        working-directory: projects/mailing-signature
+        working-directory: projects/${{ matrix.project }}
         env:
           TF_VAR_GIT_TOKEN: ${{ secrets.TF_VAR_GIT_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
 
-      - name: mailing-signature Terraform Format
-        id: mailing-signature-fmt
+      - name: Terraform Format
+        id: project-fmt
         run: terraform fmt -check
-        working-directory: projects/mailing-signature
+        working-directory: projects/${{ matrix.project }}
         env:
           TF_VAR_GIT_TOKEN: ${{ secrets.TF_VAR_GIT_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
 
-      - name: mailing-signature Terraform Validate
-        id: mailing-signature-validate
+      - name: Terraform Validate
+        id: project-validate
         run: terraform validate -no-color
-        working-directory: projects/mailing-signature
+        working-directory: projects/${{ matrix.project }}
         env:
           TF_VAR_GIT_TOKEN: ${{ secrets.TF_VAR_GIT_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
 
-      - name: mailing-signature Terraform Plan
-        id: mailing-signature-plan
+      - name: Terraform Plan
+        id: project-plan
         if: github.event_name == 'pull_request'
         run: terraform plan -no-color
-        working-directory: projects/mailing-signature
+        working-directory: projects/${{ matrix.project }}
         continue-on-error: true
         env:
           TF_VAR_GIT_TOKEN: ${{ secrets.TF_VAR_GIT_TOKEN }}
@@ -152,19 +158,19 @@ jobs:
         uses: actions/github-script@v4
         if: github.event_name == 'pull_request'
         env:
-          PLAN_MAILING_SIGNATURE: "mailing-signature\n${{ steps.mailing-signature-plan.outputs.stdout }}"
+          PLAN_PROJECT: "Project ${{ matrix.project }} \n${{ steps.project-plan.outputs.stdout }}"
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const output = `#### Terraform mailing-signature Format and Style 🖌\`${{ steps.mailing-signature-fmt.outcome }}\`
-            #### Terraform mailing-signature Initialization ⚙️\`${{ steps.mailing-signature-init.outcome }}\`
-            #### Terraform mailing-signature Plan 📖\`${{ steps.mailing-signature-plan.outcome }}\`
-            #### Terraform mailing-signature Validation 🤖\`${{ steps.mailing-signature-validate.outcome }}\`
+            const output = `#### Terraform Project Format ${{ matrix.project }} and Style 🖌\`${{ steps.project-fmt.outcome }}\`
+            #### Terraform Project Initialization ${{ matrix.project }} ⚙️\`${{ steps.project-init.outcome }}\`
+            #### Terraform Project Plan ${{ matrix.project }} 📖\`${{ steps.project-plan.outcome }}\`
+            #### Terraform Project Validation ${{ matrix.project }} 🤖\`${{ steps.project-validate.outcome }}\`
 
-            <details><summary>Show mailing-signature Plan</summary>
+            <details><summary>Show Project ${{ matrix.project }} Plan</summary>
 
             \`\`\`\n
-            ${process.env.PLAN_MAILING_SIGNATURE}
+            ${process.env.PLAN_PROJECT}
             \`\`\`
 
             </details>
@@ -178,113 +184,16 @@ jobs:
               body: output
             })
 
-      - name: mailing-signature Plan Status
-        if: steps.mailing-signature-plan.outcome == 'failure'
+      - name: Plan Status
+        if: steps.project-plan.outcome == 'failure'
         run: exit 1
 
-      - name: mailing-signature Terraform Apply
+      - name: Terraform Apply
         if: github.ref == 'refs/heads/master' && github.event_name == 'push'
         run: terraform apply -auto-approve
-        working-directory: projects/mailing-signature
+        working-directory: projects/${{ matrix.project }}
         env:
           TF_VAR_GIT_TOKEN: ${{ secrets.TF_VAR_GIT_TOKEN }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-  Terraform-ashudev-website:
-    needs:
-      - Terraform-Main-budget
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out repository code
-        uses: actions/checkout@v2
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v1
-
-      - name: ashudev-website Terraform Init
-        id: ashudev-website-init
-        run: terraform init
-        working-directory: projects/ashudev-website
-        env:
-          TF_VAR_GIT_TOKEN: ${{ secrets.TF_VAR_GIT_TOKEN }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-
-      - name: ashudev-website Terraform Format
-        id: ashudev-website-fmt
-        run: terraform fmt -check
-        working-directory: projects/ashudev-website
-        env:
-          TF_VAR_GIT_TOKEN: ${{ secrets.TF_VAR_GIT_TOKEN }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-
-      - name: ashudev-website Terraform Validate
-        id: ashudev-website-validate
-        run: terraform validate -no-color
-        working-directory: projects/ashudev-website
-        env:
-          TF_VAR_GIT_TOKEN: ${{ secrets.TF_VAR_GIT_TOKEN }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-
-      - name: ashudev-website Terraform Plan
-        id: ashudev-website-plan
-        if: github.event_name == 'pull_request'
-        run: terraform plan -no-color
-        working-directory: projects/ashudev-website
-        continue-on-error: true
-        env:
-          TF_VAR_GIT_TOKEN: ${{ secrets.TF_VAR_GIT_TOKEN }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-
-      - name: Update Pull Request
-        uses: actions/github-script@v4
-        if: github.event_name == 'pull_request'
-        env:
-          PLAN_ASHUDEV_WEBSITE: "ashudev-website\n${{ steps.ashudev-website-plan.outputs.stdout }}"
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const output = `#### Terraform ashudev-website Format and Style 🖌\`${{ steps.ashudev-website-fmt.outcome }}\`
-            #### Terraform ashudev-website Initialization ⚙️\`${{ steps.ashudev-website-init.outcome }}\`
-            #### Terraform ashudev-website Plan 📖\`${{ steps.ashudev-website-plan.outcome }}\`
-            #### Terraform ashudev-website Validation 🤖\`${{ steps.ashudev-website-validate.outcome }}\`
-
-            <details><summary>Show ashudev-website Plan</summary>
-
-            \`\`\`\n
-            ${process.env.PLAN_ASHUDEV_WEBSITE}
-            \`\`\`
-
-            </details>
-
-            *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
-
-            github.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: output
-            })
-
-      - name: ashudev-website Plan Status
-        if: steps.ashudev-website-plan.outcome == 'failure'
-        run: exit 1
-
-      - name: ashudev-website Terraform Apply
-        if: github.ref == 'refs/heads/master' && github.event_name == 'push'
-        run: terraform apply -auto-approve
-        working-directory: projects/ashudev-website
-        env:
-          TF_VAR_GIT_TOKEN: ${{ secrets.TF_VAR_GIT_TOKEN }}
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-
