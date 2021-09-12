@@ -85,8 +85,6 @@ resource "aws_cloudfront_distribution" "ashudev" {
     compress               = true
     viewer_protocol_policy = "redirect-to-https"
     min_ttl                = 0
-    default_ttl            = 3600
-    max_ttl                = 86400
   }
   viewer_certificate {
     acm_certificate_arn      = aws_acm_certificate.ashudev.arn
