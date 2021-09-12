@@ -1,13 +1,17 @@
-+ Create repo for mailingsignature
++ CI Job for route53
++ OVH ns management
++ finish Ashudev-website
++ CI Job for Ashudev-website
++ Refacto github actions
+  + multiple workflow ?
+  + for each ?
+  + Array variables ?
 + Manage github repo for project via terraform
 + Manage all github projects via terraform
 + How to use github docker repo
-+ Manage billing and cloud watch budget alerts via terraform
 
 + Migrate ashudev signature with right name
-+ Create config for ashuvidzWebsite
 
 LATER:
 + test before apply ?
 + Terragrunt or terraspace ?
-+ 
