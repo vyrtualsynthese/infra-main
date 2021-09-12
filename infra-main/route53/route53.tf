@@ -20,3 +20,17 @@ resource "aws_route53_zone" "ashudev" {
 }
 
 # TODO: NS records + SOA records
+
+resource "aws_route53_record" "ashudev_ns" {
+  allow_overwrite = true
+  zone_id = aws_route53_zone.ashudev.id
+  name    = "ashudev.com"
+  type    = "NS"
+  ttl = "172800"
+  records = [
+    "${replace(aws_route53_zone.ashudev.name_servers[0], "/\\.$/", "")}.",
+    "${replace(aws_route53_zone.ashudev.name_servers[1], "/\\.$/", "")}.",
+    "${replace(aws_route53_zone.ashudev.name_servers[2], "/\\.$/", "")}.",
+    "${replace(aws_route53_zone.ashudev.name_servers[3], "/\\.$/", "")}.",
+  ]
+}
