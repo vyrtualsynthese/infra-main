@@ -32,12 +32,12 @@ provider "aws" {
 }
 
 provider "aws" {
-  alias = "us"
+  alias  = "us"
   region = "us-east-1"
 }
 
 resource "aws_acm_certificate" "ashudev" {
-  provider = aws.us
+  provider          = aws.us
   domain_name       = "ashudev.com"
   validation_method = "DNS"
   lifecycle {
@@ -57,16 +57,16 @@ data "aws_route53_zone" "ashudev-zones" {
 }
 
 resource "aws_cloudfront_distribution" "ashudev" {
-  enabled = true
+  enabled             = true
   default_root_object = "index.html"
-  is_ipv6_enabled = true
+  is_ipv6_enabled     = true
   origin {
-    domain_name = aws_s3_bucket.ashudev-website.bucket_regional_domain_name
-    origin_id   = "ashudev-bucket"
+    domain_name         = aws_s3_bucket.ashudev-website.bucket_regional_domain_name
+    origin_id           = "ashudev-bucket"
     connection_attempts = "3"
-    connection_timeout = "10"
+    connection_timeout  = "10"
     origin_shield {
-      enabled = true
+      enabled              = true
       origin_shield_region = "eu-central-1"
     }
   }
@@ -78,11 +78,11 @@ resource "aws_cloudfront_distribution" "ashudev" {
   price_class = "PriceClass_All"
   aliases     = ["ashudev.com"]
   default_cache_behavior {
-    allowed_methods  = ["GET", "HEAD"]
-    cached_methods   = ["GET", "HEAD"]
-    target_origin_id = "ashudev-bucket"
-    cache_policy_id = data.aws_cloudfront_cache_policy.caching-optimized.id
-    compress = true
+    allowed_methods        = ["GET", "HEAD"]
+    cached_methods         = ["GET", "HEAD"]
+    target_origin_id       = "ashudev-bucket"
+    cache_policy_id        = data.aws_cloudfront_cache_policy.caching-optimized.id
+    compress               = true
     viewer_protocol_policy = "redirect-to-https"
     min_ttl                = 0
     default_ttl            = 3600
@@ -91,7 +91,7 @@ resource "aws_cloudfront_distribution" "ashudev" {
   viewer_certificate {
     acm_certificate_arn      = aws_acm_certificate.ashudev.arn
     minimum_protocol_version = "TLSv1.2_2021"
-    ssl_support_method = "sni-only"
+    ssl_support_method       = "sni-only"
   }
 }
 
@@ -100,19 +100,19 @@ resource "aws_route53_record" "ashudev_a" {
   name    = "ashudev.com"
   type    = "A"
   alias {
-    name = aws_cloudfront_distribution.ashudev.domain_name
-    zone_id = aws_cloudfront_distribution.ashudev.hosted_zone_id
+    name                   = aws_cloudfront_distribution.ashudev.domain_name
+    zone_id                = aws_cloudfront_distribution.ashudev.hosted_zone_id
     evaluate_target_health = false
   }
 }
 
-resource "aws_route53_record" "ashudev_aaa" {
+resource "aws_route53_record" "ashudev_aaaa" {
   zone_id = data.aws_route53_zone.ashudev-zones.id
   name    = "ashudev.com"
-  type    = "AAA"
+  type    = "AAAA"
   alias {
-    name = aws_cloudfront_distribution.ashudev.domain_name
-    zone_id = aws_cloudfront_distribution.ashudev.hosted_zone_id
+    name                   = aws_cloudfront_distribution.ashudev.domain_name
+    zone_id                = aws_cloudfront_distribution.ashudev.hosted_zone_id
     evaluate_target_health = false
   }
 }
