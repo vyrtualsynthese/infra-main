@@ -112,7 +112,7 @@ resource "aws_iam_group_policy_attachment" "mailing-signature" {
 
 resource "github_repository" "mailing-signature" {
   name                   = "mailing-signature"
-  visibility             = "private"
+  visibility             = "public"
   has_issues             = false
   has_downloads          = false
   has_wiki               = false
@@ -129,6 +129,26 @@ resource "github_repository" "mailing-signature" {
 resource "github_branch" "develop" {
   repository = github_repository.mailing-signature.name
   branch     = "develop"
+}
+
+resource "github_branch_protection" "main" {
+  repository_id = github_repository.mailing-signature.node_id
+
+  pattern             = github_repository.mailing-signature.default_branch
+  enforce_admins      = true
+  allows_deletions    = false
+  allows_force_pushes = false
+  required_status_checks {
+    strict = true
+  }
+}
+
+resource "github_branch_protection" "develop" {
+  repository_id = github_repository.mailing-signature.node_id
+
+  pattern          = "develop"
+  enforce_admins   = true
+  allows_deletions = false
 }
 
 /*

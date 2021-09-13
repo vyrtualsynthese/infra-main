@@ -1,4 +1,5 @@
-+ CI Job for route53
++ Protected branch for Ashudev Website [master, develop]
++ Test protected branch with github actions
 + OVH ns management
 + finish Ashudev-website
 + CI Job for Ashudev-website
