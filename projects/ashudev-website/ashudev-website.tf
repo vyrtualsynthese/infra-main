@@ -252,6 +252,7 @@ resource "github_branch_protection" "develop" {
   pattern          = "develop"
   enforce_admins   = true
   allows_deletions = false
+  allows_force_pushes = true
 }
 
 /*
