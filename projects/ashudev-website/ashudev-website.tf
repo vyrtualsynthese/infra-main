@@ -234,6 +234,26 @@ resource "github_branch" "develop" {
   branch     = "develop"
 }
 
+resource "github_branch_protection" "main" {
+  repository_id = github_repository.ashudev-website.node_id
+
+  pattern             = github_repository.ashudev-website.default_branch
+  enforce_admins      = true
+  allows_deletions    = false
+  allows_force_pushes = false
+  required_status_checks {
+    strict = true
+  }
+}
+
+resource "github_branch_protection" "develop" {
+  repository_id = github_repository.ashudev-website.node_id
+
+  pattern          = "develop"
+  enforce_admins   = true
+  allows_deletions = false
+}
+
 /*
 resource "github_actions_secret" "aws_access_key_id" {
   repository      = github_repository.mailing-signature.name
