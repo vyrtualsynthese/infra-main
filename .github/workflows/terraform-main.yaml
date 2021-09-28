@@ -104,7 +104,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        project: [ ashudev-website, mailing-signature ]
+        project: [ ashudev-website, mailing-signature, dashy ]
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2
