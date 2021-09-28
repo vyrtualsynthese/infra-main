@@ -1,6 +1,3 @@
-+ Infra main :
-  + Validate mailing signature PR
-  + Validate mailing signature PR
 + Raspberry setup :
   + Manualy setup k3s on Raspberry
   + Reset raspberry
