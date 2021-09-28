@@ -146,9 +146,9 @@ resource "github_branch_protection" "main" {
 resource "github_branch_protection" "develop" {
   repository_id = github_repository.mailing-signature.node_id
 
-  pattern          = "develop"
-  enforce_admins   = true
-  allows_deletions = false
+  pattern             = "develop"
+  enforce_admins      = true
+  allows_deletions    = false
   allows_force_pushes = true
 }
 
