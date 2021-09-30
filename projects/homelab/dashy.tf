@@ -3,7 +3,7 @@ terraform {
   backend "s3" {
     encrypt        = true
     bucket         = "ashudev-tf-states"
-    key            = "projects/dashy.tfstate"
+    key            = "projects/homelab.tfstate"
     dynamodb_table = "tf-main-lock"
   }
 
@@ -23,8 +23,8 @@ provider "github" {
   token = var.GIT_TOKEN
 }
 
-resource "github_repository" "dashy" {
-  name                   = "dashy"
+resource "github_repository" "homelab" {
+  name                   = "homelab"
   visibility             = "public"
   has_issues             = false
   has_downloads          = false
@@ -40,14 +40,14 @@ resource "github_repository" "dashy" {
 }
 
 resource "github_branch" "develop" {
-  repository = github_repository.dashy.name
+  repository = github_repository.homelab.name
   branch     = "develop"
 }
 
 resource "github_branch_protection" "main" {
-  repository_id = github_repository.dashy.node_id
+  repository_id = github_repository.homelab.node_id
 
-  pattern             = github_repository.dashy.default_branch
+  pattern             = github_repository.homelab.default_branch
   enforce_admins      = true
   allows_deletions    = false
   allows_force_pushes = false
@@ -57,7 +57,7 @@ resource "github_branch_protection" "main" {
 }
 
 resource "github_branch_protection" "develop" {
-  repository_id = github_repository.dashy.node_id
+  repository_id = github_repository.homelab.node_id
 
   pattern             = "develop"
   enforce_admins      = true
