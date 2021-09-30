@@ -2,13 +2,13 @@ apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
 metadata:
   name: simpleingressroute
-  namespace: dashy
+  namespace: homelab
 spec:
   entryPoints:
     - web
   routes:
-  - match: Host(`dashy.local`)
+  - match: Host(`homelab.local`)
     kind: Rule
     services:
-    - name: dashy
+    - name: homelab
       port: 80

@@ -3,7 +3,7 @@ appVersion: 2.26.0
 dependencies:
 - condition: kubeStateMetrics.enabled
   name: kube-state-metrics
-  repository: https://prometheus-community.github.io/helm-charts
+  repository: https://prometheus-community.github.io/homlab-charts
   version: 3.5.*
 description: Prometheus is a monitoring system and time series database.
 home: https://prometheus.io/

@@ -1,23 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: dashy
-  name: dashy
+  namespace: homelab
+  name: homelab
   labels:
-    app: dashy
+    app: homelab
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: dashy
+      app: homelab
   template:
     metadata:
       labels:
-        app: dashy
+        app: homelab
     spec:
       containers:
-        - name: dashy
-          image: registry.hub.docker.com/lissy93/dashy:arm64v8
+        - name: homelab
+          image: registry.hub.docker.com/lissy93/homelab:arm64v8
           ports:
             - name: web
               containerPort: 80
