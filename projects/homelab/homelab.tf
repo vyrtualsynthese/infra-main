@@ -45,7 +45,7 @@ resource "github_branch" "develop" {
 }
 
 resource "github_branch_protection" "main" {
-  repository_id = github_repository.homelab.node_id
+  repository_id = github_repository.homelab.name
 
   pattern             = github_repository.homelab.default_branch
   enforce_admins      = true
@@ -57,7 +57,7 @@ resource "github_branch_protection" "main" {
 }
 
 resource "github_branch_protection" "develop" {
-  repository_id = github_repository.homelab.node_id
+  repository_id = github_repository.homelab.name
 
   pattern             = "develop"
   enforce_admins      = true
