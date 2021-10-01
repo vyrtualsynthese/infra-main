@@ -132,7 +132,7 @@ resource "github_branch" "develop" {
 }
 
 resource "github_branch_protection" "main" {
-  repository_id = github_repository.mailing-signature.node_id
+  repository_id = github_repository.mailing-signature.name
 
   pattern             = github_repository.mailing-signature.default_branch
   enforce_admins      = true
@@ -144,7 +144,7 @@ resource "github_branch_protection" "main" {
 }
 
 resource "github_branch_protection" "develop" {
-  repository_id = github_repository.mailing-signature.node_id
+  repository_id = github_repository.mailing-signature.name
 
   pattern             = "develop"
   enforce_admins      = true

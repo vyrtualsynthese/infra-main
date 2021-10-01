@@ -235,7 +235,7 @@ resource "github_branch" "develop" {
 }
 
 resource "github_branch_protection" "main" {
-  repository_id = github_repository.ashudev-website.node_id
+  repository_id = github_repository.ashudev-website.name
 
   pattern             = github_repository.ashudev-website.default_branch
   enforce_admins      = true
@@ -247,7 +247,7 @@ resource "github_branch_protection" "main" {
 }
 
 resource "github_branch_protection" "develop" {
-  repository_id = github_repository.ashudev-website.node_id
+  repository_id = github_repository.ashudev-website.name
 
   pattern             = "develop"
   enforce_admins      = true
