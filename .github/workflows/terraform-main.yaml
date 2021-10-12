@@ -13,12 +13,24 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Get file changes
+        id: changed-files-specific
+        uses: tj-actions/changed-files@v10
+        with:
+          files: |
+            infra-main/${{ matrix.project }}
 
       - name: Setup Terraform
+        if: steps.changed-files-specific.outputs.any_changed == 'true'
         uses: hashicorp/setup-terraform@v1
 
       - name: Terraform Init
         id: infra-main-init
+        if: steps.changed-files-specific.outputs.any_changed == 'true'
         run: terraform init
         working-directory: infra-main/${{ matrix.project }}
         env:
@@ -28,6 +40,7 @@ jobs:
 
       - name: Terraform Format
         id: infra-main-fmt
+        if: steps.changed-files-specific.outputs.any_changed == 'true'
         run: terraform fmt -check
         working-directory: infra-main/${{ matrix.project }}
         env:
@@ -37,6 +50,7 @@ jobs:
 
       - name: Terraform Validate
         id: infra-main-validate
+        if: steps.changed-files-specific.outputs.any_changed == 'true'
         run: terraform validate -no-color
         working-directory: infra-main/${{ matrix.project }}
         env:
@@ -46,7 +60,7 @@ jobs:
 
       - name: Terraform Plan
         id: infra-main-plan
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && steps.changed-files-specific.outputs.any_changed == 'true'
         run: terraform plan -no-color
         working-directory: infra-main/${{ matrix.project }}
         continue-on-error: true
@@ -57,7 +71,7 @@ jobs:
 
       - name: Update Pull Request
         uses: actions/github-script@v4
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && steps.changed-files-specific.outputs.any_changed == 'true'
         env:
           PLAN_MAIN_INFRA: "Infra Main ${{ matrix.project }}\n${{ steps.infra-main-plan.outputs.stdout }}"
         with:
@@ -86,11 +100,11 @@ jobs:
             })
 
       - name: Plan Status
-        if: steps.infra-main-plan.outcome == 'failure'
+        if: steps.infra-main-plan.outcome == 'failure' && steps.changed-files-specific.outputs.any_changed == 'true'
         run: exit 1
 
       - name: Terraform Apply
-        if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+        if: github.ref == 'refs/heads/master' && github.event_name == 'push' && steps.changed-files-specific.outputs.any_changed == 'true'
         run: terraform apply -auto-approve
         working-directory: infra-main/${{ matrix.project }}
         env:
@@ -108,12 +122,24 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Get file changes
+        id: changed-files-specific
+        uses: tj-actions/changed-files@v10
+        with:
+          files: |
+            projects/${{ matrix.project }}
 
       - name: Setup Terraform
+        if: steps.changed-files-specific.outputs.any_changed == 'true'
         uses: hashicorp/setup-terraform@v1
 
       - name: Terraform Init
         id: project-init
+        if: steps.changed-files-specific.outputs.any_changed == 'true'
         run: terraform init
         working-directory: projects/${{ matrix.project }}
         env:
@@ -124,6 +150,7 @@ jobs:
 
       - name: Terraform Format
         id: project-fmt
+        if: steps.changed-files-specific.outputs.any_changed == 'true'
         run: terraform fmt -check
         working-directory: projects/${{ matrix.project }}
         env:
@@ -134,6 +161,7 @@ jobs:
 
       - name: Terraform Validate
         id: project-validate
+        if: steps.changed-files-specific.outputs.any_changed == 'true'
         run: terraform validate -no-color
         working-directory: projects/${{ matrix.project }}
         env:
@@ -144,7 +172,7 @@ jobs:
 
       - name: Terraform Plan
         id: project-plan
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && steps.changed-files-specific.outputs.any_changed == 'true'
         run: terraform plan -no-color
         working-directory: projects/${{ matrix.project }}
         continue-on-error: true
@@ -156,7 +184,7 @@ jobs:
 
       - name: Update Pull Request
         uses: actions/github-script@v4
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && steps.changed-files-specific.outputs.any_changed == 'true'
         env:
           PLAN_PROJECT: "Project ${{ matrix.project }} \n${{ steps.project-plan.outputs.stdout }}"
         with:
@@ -185,11 +213,11 @@ jobs:
             })
 
       - name: Plan Status
-        if: steps.project-plan.outcome == 'failure'
+        if: steps.project-plan.outcome == 'failure' && steps.changed-files-specific.outputs.any_changed == 'true'
         run: exit 1
 
       - name: Terraform Apply
-        if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+        if: github.ref == 'refs/heads/master' && github.event_name == 'push' && steps.changed-files-specific.outputs.any_changed == 'true'
         run: terraform apply -auto-approve
         working-directory: projects/${{ matrix.project }}
         env:
