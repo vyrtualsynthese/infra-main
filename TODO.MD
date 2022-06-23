@@ -1,6 +1,5 @@
-+ Ansible
-  + Ansible Inventory viewer
-  + Ansible Dynamic Inventory Manager
++ Re add route53 to github workflow
++ Update route53 config
 + Readme des projets mailing-signature, ashudev-website, infra-main
 + OVH ns management
 + Manage all github projects via terraform

@@ -11,7 +11,12 @@
     "tf:ashudev-website:init": "docker run -it --rm -u ${UID}:${GID} -v $PWD:/home/node/app --env-file .env -w /home/node/app hashicorp/terraform:latest -chdir=/home/node/app/projects/ashudev-website init -migrate-state",
     "tf:ashudev-website:fmt": "docker run -it --rm -u ${UID}:${GID} -v $PWD:/home/node/app --env-file .env -w /home/node/app hashicorp/terraform:latest -chdir=/home/node/app/projects/ashudev-website fmt",
     "tf:ashudev-website:plan": "docker run -it --rm -u ${UID}:${GID} -v $PWD:/home/node/app --env-file .env -w /home/node/app hashicorp/terraform:latest -chdir=/home/node/app/projects/ashudev-website plan",
-    "tf:ashudev-website:apply": "docker run -it --rm -u ${UID}:${GID} -v $PWD:/home/node/app --env-file .env -w /home/node/app hashicorp/terraform:latest -chdir=/home/node/app/projects/ashudev-website apply"
+    "tf:ashudev-website:apply": "docker run -it --rm -u ${UID}:${GID} -v $PWD:/home/node/app --env-file .env -w /home/node/app hashicorp/terraform:latest -chdir=/home/node/app/projects/ashudev-website apply",
+    "tf:homelab": "npm run tf:homelab:init && npm run tf:homelab:fmt && npm run tf:homelab:plan && npm run tf:homelab:apply",
+    "tf:homelab:init": "docker run -it --rm -u ${UID}:${GID} -v $PWD:/home/node/app --env-file .env -w /home/node/app hashicorp/terraform:latest -chdir=/home/node/app/projects/homelab init -migrate-state",
+    "tf:homelab:fmt": "docker run -it --rm -u ${UID}:${GID} -v $PWD:/home/node/app --env-file .env -w /home/node/app hashicorp/terraform:latest -chdir=/home/node/app/projects/homelab fmt",
+    "tf:homelab:plan": "docker run -it --rm -u ${UID}:${GID} -v $PWD:/home/node/app --env-file .env -w /home/node/app hashicorp/terraform:latest -chdir=/home/node/app/projects/homelab plan",
+    "tf:homelab:apply": "docker run -it --rm -u ${UID}:${GID} -v $PWD:/home/node/app --env-file .env -w /home/node/app hashicorp/terraform:latest -chdir=/home/node/app/projects/homelab apply"
   },
   "repository": {
     "type": "git",

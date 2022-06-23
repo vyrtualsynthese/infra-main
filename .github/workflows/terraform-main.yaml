@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        project: [ budget, route53 ]
+        project: [ budget ]
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2

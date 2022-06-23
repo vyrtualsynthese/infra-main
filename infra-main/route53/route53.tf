@@ -76,26 +76,6 @@ resource "aws_route53_record" "dmarc_ashudev_com" {
   ]
 }
 
-resource "aws_route53_record" "protonmail_domainkey_ashudev_com" {
-  zone_id = aws_route53_zone.ashudev.id
-  name    = "protonmail._domainkey.ashudev.com"
-  type    = "CNAME"
-  ttl     = "3600"
-  records = [
-    "protonmail.domainkey.d6opq6cen37c7ogrdxtnmmxv47fpddeghacxjnx54dtrxtqifr4hq.domains.proton.ch.",
-  ]
-}
-
-resource "aws_route53_record" "protonmail2_domainkey_ashudev_com" {
-  zone_id = aws_route53_zone.ashudev.id
-  name    = "protonmail2._domainkey.ashudev.com"
-  type    = "CNAME"
-  ttl     = "3600"
-  records = [
-    "protonmail2.domainkey.d6opq6cen37c7ogrdxtnmmxv47fpddeghacxjnx54dtrxtqifr4hq.domains.proton.ch.",
-  ]
-}
-
 resource "aws_route53_record" "protonmail3_domainkey_ashudev_com" {
   zone_id = aws_route53_zone.ashudev.id
   name    = "protonmail3._domainkey.ashudev.com"

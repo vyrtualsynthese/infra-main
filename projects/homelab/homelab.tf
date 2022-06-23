@@ -12,7 +12,82 @@ terraform {
       source  = "integrations/github"
       version = "~> 4.13"
     }
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 3.55"
+    }
   }
+}
+
+data "aws_route53_zone" "selected" {
+  name         = "ashudev.com."
+}
+
+resource "aws_iam_policy" "homelab" {
+  name = "homelab"
+  path = "/projects/"
+  tags = {
+    "project" = "homelab"
+  }
+
+  policy = jsonencode({
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "",
+        "Effect": "Allow",
+        "Action": [
+          "route53:GetChange",
+          "route53:ChangeResourceRecordSets",
+          "route53:ListResourceRecordSets"
+        ],
+        "Resource": [
+          "arn:aws:route53:::hostedzone/*",
+          "arn:aws:route53:::change/*"
+        ]
+      },
+      {
+        "Sid": "",
+        "Effect": "Allow",
+        "Action": "route53:ListHostedZonesByName",
+        "Resource": data.aws_route53_zone.selected.arn
+      }
+    ]
+  }
+  )
+}
+
+resource "aws_iam_user" "homelab-terraform" {
+  name = "homelab-terraform"
+  path = "/projects/homelab/"
+  tags = {
+    project = "homelab"
+  }
+}
+
+/* access key not working atm
+resource "aws_iam_access_key" "mailing-signature-terraform" {
+  user = aws_iam_user.mailing-signature-terraform.name
+}
+*/
+
+resource "aws_iam_group" "homelab" {
+  name = "homelab"
+  path = "/projects/homelab/"
+}
+
+resource "aws_iam_group_membership" "homelab" {
+  name = "tf-homelab-group-membership"
+  users = [
+    aws_iam_user.homelab-terraform.name,
+  ]
+
+  group = aws_iam_group.homelab.name
+}
+
+resource "aws_iam_group_policy_attachment" "homelab" {
+  group      = aws_iam_group.homelab.name
+  policy_arn = aws_iam_policy.homelab.arn
 }
 
 variable "GIT_TOKEN" {
